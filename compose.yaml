@@ -1,0 +1,8 @@
+services:
+  proglog:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    entrypoint: tail -f /dev/null
+    volumes:
+      - ./:/app
