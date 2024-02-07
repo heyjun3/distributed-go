@@ -75,7 +75,7 @@ func (l *Log) Append(record *api.Record) (uint64, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	highestOffset, err := l.highsetOffset()
+	highestOffset, err := l.highestOffset()
 	if err != nil {
 		return 0, err
 	}
