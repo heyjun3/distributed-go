@@ -96,7 +96,7 @@ func (l *Log) Append(record *api.Record) (uint64, error) {
 
 func (l *Log) Read(off uint64) (*api.Record, error) {
 	l.mu.RLock()
-	defer l.mu.Unlock()
+	defer l.mu.RUnlock()
 	var s *segment
 	for _, segment := range l.segments {
 		if segment.baseOffset <= off && off < segment.nextOffset {
@@ -137,13 +137,13 @@ func (l *Log) Reset() error {
 
 func (l *Log) LowestOffset() (uint64, error) {
 	l.mu.RLock()
-	defer l.mu.Unlock()
+	defer l.mu.RUnlock()
 	return l.segments[0].baseOffset, nil
 }
 
 func (l *Log) HighestOffset() (uint64, error) {
 	l.mu.RLock()
-	defer l.mu.Unlock()
+	defer l.mu.RUnlock()
 
 	return l.highestOffset()
 }
@@ -175,7 +175,7 @@ func (l *Log) Truncate(lowest uint64) error {
 
 func (l *Log) Reader() io.Reader {
 	l.mu.RLock()
-	defer l.mu.Unlock()
+	defer l.mu.RUnlock()
 	readers := make([]io.Reader, len(l.segments))
 	for i, segment := range l.segments {
 		readers[i] = &originReader{segment.store, 0}
