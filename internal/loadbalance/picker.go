@@ -36,3 +36,35 @@ func (p *Picker) Build(buildInfo base.PickerBuildInfo) balancer.Picker {
 	p.followers = followers
 	return p
 }
+
+var _ balancer.Picker = (*Picker)(nil)
+
+func (p *Picker) Pick(info balancer.PickInfo) (
+	balancer.PickResult, error) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	var result balancer.PickResult
+	if strings.Contains(info.FullMethodName, "Produce") ||
+		len(p.followers) == 0 {
+		result.SubConn = p.leader
+	} else if strings.Contains(info.FullMethodName, "Consume") {
+		result.SubConn = p.nextFollower()
+	}
+	if result.SubConn == nil {
+		return result, balancer.ErrNoSubConnAvailable
+	}
+	return result, nil
+}
+
+func (p *Picker) nextFollower() balancer.SubConn {
+	cur := atomic.AddUint64(&p.current, uint64(1))
+	len := uint64(len(p.followers))
+	idx := int(cur % len)
+	return p.followers[idx]
+}
+
+func init() {
+	balancer.Register(
+		base.NewBalancerBuilder(Name, &Picker{}, base.Config{}),
+	)
+}
