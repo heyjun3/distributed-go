@@ -2,7 +2,7 @@ services:
   proglog:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./local.Dockerfile
     entrypoint: tail -f /dev/null
     volumes:
       - ./:/app

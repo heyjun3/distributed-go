@@ -1,4 +1,8 @@
-FROM golang:1.21.6-bookworm
+FROM golang:1.22.1 AS build
+WORKDIR /go/src/proglog
+COPY . .
+RUN CGO_ENABLED=0 go build -o /go/bin/proglog ./cmd/proglog
 
-RUN apt update -y && \
-    apt install -y protobuf-compiler
+FROM scratch
+COPY --from=build go/bin/proglog /bin/proglog
+ENTRYPOINT ["/bin/proglog"]
