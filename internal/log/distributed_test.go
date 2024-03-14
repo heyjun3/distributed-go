@@ -2,7 +2,6 @@ package log_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"reflect"
@@ -22,7 +21,7 @@ func TestMultipleNodes(t *testing.T) {
 	ports := dynaport.Get(nodeCount)
 
 	for i := 0; i < nodeCount; i++ {
-		dataDir, err := ioutil.TempDir("", "distributed-log-test")
+		dataDir, err := os.MkdirTemp("", "distributed-log-test")
 		require.NoError(t, err)
 		defer func(dir string) {
 			_ = os.RemoveAll(dir)
@@ -41,6 +40,7 @@ func TestMultipleNodes(t *testing.T) {
 		config.Raft.ElectionTimeout = 500 * time.Millisecond
 		config.Raft.LeaderLeaseTimeout = 500 * time.Millisecond
 		config.Raft.CommitTimeout = 5 * time.Millisecond
+		config.Raft.BindAddr = ln.Addr().String()
 
 		if i == 0 {
 			config.Raft.Bootstrap = true
