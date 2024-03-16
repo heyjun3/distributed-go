@@ -17,7 +17,7 @@ spec:
       initContainers:
         - name: {{ include "proglog.fullname" . }}-config-init
           image: busybox
-          imagePullPolicy: IfNotPersent
+          # imagePullPolicy: IfNotPersent
           command:
             - /bin/sh
             - -c
@@ -46,11 +46,19 @@ spec:
             - --config-file=/var/run/proglog/config.yaml
           readinessProbe:
             exec:
-              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.rpcPort }}"]
+              command:
+                - /bin/sh
+                - -c
+                - |-
+                  /bin/grpc_health_probe -addr=$HOSTNAME.proglog.{{.Release.Namespace}}.svc.cluster.local:{{.Values.rpcPort}}
             initialDelaySeconds: 10
           livenessProbe:
             exec:
-              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.rpcPort }}"]
+              command:
+                - /bin/sh
+                - -c
+                - |-
+                  /bin/grpc_health_probe -addr=$HOSTNAME.proglog.{{.Release.Namespace}}.svc.cluster.local:{{.Values.rpcPort}}
             initialDelaySeconds: 10
           volumeMounts:
             - name: datadir

@@ -41,6 +41,10 @@ compile:
 		--go_opt=paths=source_relative \
 		--go-grpc_opt=paths=source_relative \
 		--proto_path=.
+gen-acl:
+	cp test/model.conf $(CONFIG_PATH)/model.conf
+	cp test/policy.csv $(CONFIG_PATH)/policy.csv
+
 
 $(CONFIG_PATH)/model.conf:
 	cp test/model.conf $(CONFIG_PATH)/model.conf
