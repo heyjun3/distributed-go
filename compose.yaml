@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: ./local.Dockerfile
     entrypoint: tail -f /dev/null
+    network_mode: "host"
     volumes:
       - ./:/app
       - pkg:/go/bin
